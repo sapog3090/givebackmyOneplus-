@@ -27,11 +27,23 @@ jobs:
           name: givebackmyOneplus-apk
           path: givebackmyOneplus.apk
       # Постоянная прямая ссылка: releases/download/latest/givebackmyOneplus.apk
-      - name: Publish latest release
+      - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
-          name: build ${{ github.run_number }}
-          prerelease: true
+          name: givebackmyOneplus build 20
+          prerelease: false
           files: givebackmyOneplus.apk
-          body: "Сборка ${{ github.run_number }} (${{ github.sha }})"
+          body: |
+            ## givebackmyOneplus — build 20
+
+            Фишки OnePlus и очистка от рекламы для Xiaomi / Redmi / POCO на HyperOS. Без root.
+
+            **Функции:** Alert Slider, Live Alerts, Horizon Light, анимация зарядки (3 стиля),
+            Zen Mode, режим чтения (ч/б), игровой режим, Shelf (полка), виджет часов OnePlus-стиля.
+            **Очистка:** удаление рекламы и лишних приложений Xiaomi через Shizuku.
+            **Тема:** перекраска иконок в предпросмотре (применение на столе — после root).
+
+            Неофициальный проект, не связан с OnePlus и Xiaomi.
+
+            _Прямая ссылка на APK:_ releases/download/latest/givebackmyOneplus.apk

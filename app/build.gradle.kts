@@ -12,9 +12,8 @@ android {
         minSdk = 29
         targetSdk = 35
         // Номер сборки GitHub Actions — чтобы каждая новая сборка была «новее» предыдущей.
-        val ciBuild = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
-        versionCode = ciBuild
-        versionName = "0.3.$ciBuild"
+        versionCode = 20
+        versionName = "1.0 (build 20)"
     }
 
     signingConfigs {
