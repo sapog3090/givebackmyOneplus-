@@ -257,6 +257,10 @@ class MainActivity : AppCompatActivity() {
             "f=\$(ls -t $data/meta/theme/*.mrm 2>/dev/null | head -1); echo \$f; head -c 1800 \"\$f\" 2>&1",
             "echo; echo '== rights dirs'",
             "ls -la $data/rights/theme 2>&1 | head -20",
+            "echo '== mrc signatures'",
+            "for f in \$(find $data/content -name '*.mrc' | head -6); do echo \$f; head -c 8 \"\$f\" | od -c | head -1; done",
+            "echo '== installed theme meta (full)'",
+            "f=\$(grep -l 'Hyper Daniel' $data/meta/theme/*.mrm 2>/dev/null | head -1); echo \$f; head -c 5000 \"\$f\" 2>&1",
             "echo '== write test'",
             "touch $data/import/.gbmo_test && echo WRITE_OK && rm $data/import/.gbmo_test",
         ).joinToString("; ")
