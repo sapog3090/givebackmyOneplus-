@@ -94,13 +94,30 @@ class LivePill(private val ctx: Context) {
         PixelFormat.TRANSLUCENT,
     ).apply {
         gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-        y = dp(4)
+        y = offsetY()
         layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+    }
+
+    /** Отступ сверху: из ползунка или чуть ниже строки состояния (под камерой). */
+    private fun offsetY(): Int {
+        val custom = Features.pillOffsetDp(ctx)
+        if (custom >= 0) return dp(custom)
+        val id = ctx.resources.getIdentifier("status_bar_height", "dimen", "android")
+        val bar = if (id > 0) ctx.resources.getDimensionPixelSize(id) else dp(28)
+        return bar + dp(2)
     }
 
     fun show(item: LiveItem, accent: Int) {
         if (dismissed == item.key + item.text) return
         dismissed = null
+        root?.let { existing ->
+            // Высоту могли поменять ползунком — двигаем уже показанную пилюлю.
+            val lp = existing.layoutParams as? WindowManager.LayoutParams
+            if (lp != null && lp.y != offsetY()) {
+                lp.y = offsetY()
+                try { wm.updateViewLayout(existing, lp) } catch (_: Exception) {}
+            }
+        }
         val view = root ?: create().also {
             try {
                 wm.addView(it, params())

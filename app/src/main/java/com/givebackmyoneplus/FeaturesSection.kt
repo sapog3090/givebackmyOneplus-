@@ -67,6 +67,8 @@ class FeaturesSection(private val activity: Activity) {
             status.postDelayed({ updateStatus() }, 6000)
         }
 
+        setupPillOffset()
+
         bindSwitch(R.id.swLive, Features.LIVE)
         bindSwitch(R.id.swHorizon, Features.HORIZON)
         bindSwitch(R.id.swCharging, Features.CHARGING)
@@ -89,6 +91,38 @@ class FeaturesSection(private val activity: Activity) {
         FeatureService.sync(activity)
         updateStatus()
     }
+
+    private var testPill: LivePill? = null
+
+    private fun setupPillOffset() {
+        val label = activity.findViewById<android.widget.TextView>(R.id.pillOffsetLabel)
+        val slider = activity.findViewById<com.google.android.material.slider.Slider>(R.id.pillOffset)
+        val density = activity.resources.displayMetrics.density
+        val id = activity.resources.getIdentifier("status_bar_height", "dimen", "android")
+        val autoDp = ((if (id > 0) activity.resources.getDimensionPixelSize(id) else (28 * density).toInt()) / density).toInt() + 2
+        val saved = Features.pillOffsetDp(activity)
+        slider.value = (if (saved >= 0) saved else autoDp).coerceIn(0, 120).toFloat()
+        label.text = "Высота пилюли: ${slider.value.toInt()} dp"
+        slider.addOnChangeListener { _, value, fromUser ->
+            label.text = "Высота пилюли: ${value.toInt()} dp"
+            if (fromUser) {
+                Features.prefs(activity).edit().putInt(Features.PILL_Y, value.toInt()).apply()
+                testPill?.show(sampleItem(), Features.accent(activity))
+            }
+        }
+        activity.findViewById<MaterialButton>(R.id.btnTestPill).setOnClickListener {
+            if (!requireOverlay()) return@setOnClickListener
+            val pill = testPill ?: LivePill(activity.applicationContext).also { testPill = it }
+            pill.show(sampleItem(), Features.accent(activity))
+            status.postDelayed({ pill.hide() }, 5000)
+        }
+    }
+
+    private fun sampleItem() = LiveItem(
+        key = "gbmo_test", priority = 0,
+        icon = android.graphics.drawable.Icon.createWithResource(activity, R.drawable.ic_slider_ring),
+        text = "Тест Live Alerts 🍉", intent = null,
+    )
 
     private fun updateStatus() {
         status.text = "Служба: " + (if (FeatureService.running) "✅ работает" else "❌ не работает") +
