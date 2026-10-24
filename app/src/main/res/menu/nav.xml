@@ -1,5 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/navTheme" android:icon="@drawable/ic_nav_theme" android:title="Тема" />
+    <item android:id="@+id/navFeatures" android:icon="@drawable/ic_nav_features" android:title="Функции" />
     <item android:id="@+id/navClean" android:icon="@drawable/ic_nav_clean" android:title="Очистка" />
     <item android:id="@+id/navAbout" android:icon="@drawable/ic_nav_about" android:title="О приложении" />
 </menu>

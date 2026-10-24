@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var preview: IconPreviewView
     private lateinit var nav: BottomNavigationView
     private val checks = mutableMapOf<String, CheckBox>()
+    private lateinit var features: FeaturesSection
 
     private val permissionListener = Shizuku.OnRequestPermissionResultListener { _, _ ->
         runOnUiThread { refreshShizuku() }
@@ -70,6 +71,7 @@ class MainActivity : AppCompatActivity() {
 
         setupNav()
         setupTheme()
+        features = FeaturesSection(this)
         setupClean()
         setupAbout()
         applyAccent()
@@ -79,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         refreshShizuku()
         refreshBloat()
+        features.refresh()
     }
 
     override fun onDestroy() {
@@ -92,6 +95,7 @@ class MainActivity : AppCompatActivity() {
         nav = findViewById(R.id.nav)
         val sections = mapOf(
             R.id.navTheme to findViewById<View>(R.id.sectionTheme),
+            R.id.navFeatures to findViewById<View>(R.id.sectionFeatures),
             R.id.navClean to findViewById<View>(R.id.sectionClean),
             R.id.navAbout to findViewById<View>(R.id.sectionAbout),
         )

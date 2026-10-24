@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sectionFeatures"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="24dp">
+
+        <TextView style="@style/Gbmo.Title" android:text="Функции" />
+        <TextView style="@style/Gbmo.Hint" android:text="Фишки OnePlus на вашем HyperOS" />
+
+        <LinearLayout style="@style/Gbmo.Card">
+            <TextView style="@style/Gbmo.CardTitle" android:text="Разрешения" />
+            <TextView style="@style/Gbmo.Hint" android:text="Без них функции не заработают. На HyperOS также включите «Автозапуск»." />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPermNotif"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPermOverlay"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPermDnd"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAppSettings"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Автозапуск и работа в фоне →" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Gbmo.Card">
+            <TextView style="@style/Gbmo.CardTitle" android:text="Alert Slider" />
+            <TextView style="@style/Gbmo.Hint" android:text="Три режима, как у переключателя OnePlus. Добавьте плитку «Alert Slider» в шторку: карандаш в быстрых настройках." />
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/sliderGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/slRing"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Звук" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/slVibrate"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Вибро" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/slSilent"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Тишина" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+        </LinearLayout>
+
+        <LinearLayout style="@style/Gbmo.Card">
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/swLive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Live Alerts"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+            <TextView style="@style/Gbmo.Hint" android:text="Пилюля у камеры: музыка, таймер, звонок, навигация, загрузки. Нажатие — открыть, долгое нажатие — скрыть." />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Gbmo.Card">
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/swHorizon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Horizon Light"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+            <TextView style="@style/Gbmo.Hint" android:text="Подсветка краёв экрана акцентным цветом при новом уведомлении." />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTestHorizon"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Показать" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Gbmo.Card">
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/swCharging"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Анимация зарядки"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+            <TextView style="@style/Gbmo.Hint" android:text="Анимация в стиле Warp Charge при подключении зарядки." />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTestCharging"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Показать" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
