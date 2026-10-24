@@ -177,9 +177,56 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        findViewById<MaterialButton>(R.id.btnThemeDiag).setOnClickListener { themeDiagnostics() }
         findViewById<MaterialButton>(R.id.btnOpenThemes).setOnClickListener {
             val intent = packageManager.getLaunchIntentForPackage("com.android.thememanager")
             if (intent != null) startActivity(intent) else toast("Приложение «Темы» не найдено")
+        }
+    }
+
+    /** Только чтение: версия «Тем», их экраны и папки — чтобы найти способ применить тему. */
+    private fun themeDiagnostics() {
+        if (!Shell.granted()) {
+            toast("Нужен доступ Shizuku (вкладка «Очистка»)")
+            return
+        }
+        val tm = "com.android.thememanager"
+        val cmd = listOf(
+            "echo '== version'",
+            "dumpsys package $tm | grep -E 'versionName|versionCode' | head -4",
+            "echo '== activities'",
+            "dumpsys package $tm | grep -oE '$tm/[A-Za-z0-9_.\$]+' | sort -u | head -200",
+            "echo '== data dir'",
+            "ls -la /sdcard/Android/data/$tm/files 2>&1 | head -40",
+            "echo '== MIUI dirs'",
+            "find /sdcard/Android/data/$tm/files -maxdepth 4 -type d 2>&1 | head -80",
+            "echo '== /sdcard/MIUI/theme'",
+            "ls -la /sdcard/MIUI/theme 2>&1 | head -20",
+            "echo '== mtz files'",
+            "find /sdcard/Android/data/$tm /sdcard/MIUI -name '*.mtz' 2>/dev/null | head -20",
+        ).joinToString("; ")
+        toast("Собираю данные…")
+        lifecycleScope.launch {
+            val out = withContext(Dispatchers.IO) {
+                runCatching { Shell.run(cmd).second }.getOrElse { "Ошибка: ${it.message}" }
+            }
+            val text = TextView(this@MainActivity).apply {
+                this.text = out
+                setTextIsSelectable(true)
+                typeface = Typeface.MONOSPACE
+                textSize = 11f
+                setPadding(dp(16), dp(8), dp(16), dp(8))
+            }
+            MaterialAlertDialogBuilder(this@MainActivity)
+                .setTitle("Диагностика «Тем»")
+                .setView(android.widget.ScrollView(this@MainActivity).apply { addView(text) })
+                .setPositiveButton("Копировать") { _, _ ->
+                    val cm = getSystemService(android.content.ClipboardManager::class.java)
+                    cm.setPrimaryClip(android.content.ClipData.newPlainText("diag", out))
+                    toast("Скопировано — вставьте в чат")
+                }
+                .setNegativeButton("Закрыть", null)
+                .show()
         }
     }
 
