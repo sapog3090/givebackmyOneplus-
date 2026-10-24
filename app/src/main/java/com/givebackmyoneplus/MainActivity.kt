@@ -185,7 +185,23 @@ class MainActivity : AppCompatActivity() {
             try {
                 startActivity(Intent("com.android.thememanager.debugmode").setPackage("com.android.thememanager"))
             } catch (e: Exception) {
-                toast("Не открылся: ${e.message}")
+                // Обычным приложениям закрыто — пробуем с правами ADB через Shizuku.
+                if (!Shell.granted()) {
+                    toast("Закрыто для приложений. Нужен Shizuku для второй попытки")
+                } else {
+                    lifecycleScope.launch {
+                        val out = withContext(Dispatchers.IO) {
+                            runCatching {
+                                Shell.run("am start -a com.android.thememanager.debugmode -p com.android.thememanager 2>&1").second
+                            }.getOrElse { it.message.orEmpty() }
+                        }
+                        MaterialAlertDialogBuilder(this@MainActivity)
+                            .setTitle("Режим отладки через Shizuku")
+                            .setMessage(out.ifBlank { "Команда выполнена" })
+                            .setPositiveButton("OK", null)
+                            .show()
+                    }
+                }
             }
         }
         findViewById<MaterialButton>(R.id.btnOpenThemes).setOnClickListener {
