@@ -98,6 +98,13 @@
             android:layout_height="wrap_content"
             android:text="Эксперимент: подложить тему в «Темы»" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnThemeDebug"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Режим отладки «Тем»" />
+
         <TextView
             android:id="@+id/themeStatus"
             style="@style/Gbmo.Hint"

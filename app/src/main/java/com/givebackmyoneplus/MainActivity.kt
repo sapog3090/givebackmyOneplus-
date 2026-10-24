@@ -180,6 +180,14 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<MaterialButton>(R.id.btnThemeDiag).setOnClickListener { themeDiagnostics() }
         findViewById<MaterialButton>(R.id.btnThemeImport).setOnClickListener { themeImportExperiment() }
+        findViewById<MaterialButton>(R.id.btnThemeDebug).setOnClickListener {
+            // Скрытый режим отладки «Тем» (открытый intent-filter, Shizuku не нужен).
+            try {
+                startActivity(Intent("com.android.thememanager.debugmode").setPackage("com.android.thememanager"))
+            } catch (e: Exception) {
+                toast("Не открылся: ${e.message}")
+            }
+        }
         findViewById<MaterialButton>(R.id.btnOpenThemes).setOnClickListener {
             val intent = packageManager.getLaunchIntentForPackage("com.android.thememanager")
             if (intent != null) startActivity(intent) else toast("Приложение «Темы» не найдено")
@@ -224,16 +232,15 @@ class MainActivity : AppCompatActivity() {
         val tm = "com.android.thememanager"
         val data = "/sdcard/Android/data/$tm/files/MIUI/theme/.data"
         val cmd = listOf(
-            "echo '== .data tree'",
-            "ls -laR $data 2>&1 | head -120",
-            "echo '== meta sample'",
-            "f=\$(find $data/meta -type f 2>/dev/null | head -1); echo \$f; head -c 2500 \"\$f\" 2>&1",
-            "echo; echo '== rights sample'",
-            "f=\$(find $data/rights -type f 2>/dev/null | head -1); echo \$f; head -c 800 \"\$f\" 2>&1 | strings | head -20",
-            "echo; echo '== intent filters'",
-            "dumpsys package $tm | grep -iE 'mtz|scheme|mimeType|Action: \"' | sort -u | head -60",
-            "echo '== debug/trial/import components'",
-            "dumpsys package $tm | grep -iE -A4 'DebugModeActivity|ThemeTrialReceiver|ComponentActivity|import' | head -60",
+            "echo '== ViewLocalResource / theme:// handlers'",
+            "dumpsys package $tm | grep -B12 -A10 -E 'Scheme: \"(ViewLocalResource|theme)\"' | head -90",
+            "echo '== import dir'",
+            "ls -laR $data/import 2>&1 | head -30",
+            "echo '== theme metas'",
+            "ls -la $data/meta/theme 2>&1 | head -20",
+            "f=\$(ls -t $data/meta/theme/*.mrm 2>/dev/null | head -1); echo \$f; head -c 1800 \"\$f\" 2>&1",
+            "echo; echo '== rights dirs'",
+            "ls -la $data/rights/theme 2>&1 | head -20",
             "echo '== write test'",
             "touch $data/import/.gbmo_test && echo WRITE_OK && rm $data/import/.gbmo_test",
         ).joinToString("; ")
