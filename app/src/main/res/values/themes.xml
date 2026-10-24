@@ -8,7 +8,7 @@
         <item name="android:navigationBarColor">@color/surface</item>
     </style>
 
-    <style name="Gbmo.Card">
+    <style name="Gbmo.Card" parent="">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">12dp</item>
@@ -17,7 +17,7 @@
         <item name="android:padding">16dp</item>
     </style>
 
-    <style name="Gbmo.Title">
+    <style name="Gbmo.Title" parent="">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/text</item>
@@ -26,7 +26,7 @@
         <item name="android:layout_marginBottom">4dp</item>
     </style>
 
-    <style name="Gbmo.CardTitle">
+    <style name="Gbmo.CardTitle" parent="">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/text</item>
@@ -34,7 +34,7 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Gbmo.Hint">
+    <style name="Gbmo.Hint" parent="">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/text_secondary</item>
