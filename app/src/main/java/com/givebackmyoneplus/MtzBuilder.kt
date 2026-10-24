@@ -48,7 +48,7 @@ object MtzBuilder {
                 zip.putBitmap("res/drawable-xxhdpi/${app.pkg}.png", bmp, Bitmap.CompressFormat.PNG)
             }
             // Подложка и маска для приложений, которых нет в списке (установленных позже).
-            val bg = if (style == IconStyle.MONO) 0xFF1E1E21.toInt() else accent
+            val bg = if (style == IconStyle.DARK_TINT) 0xFF1E1E21.toInt() else accent
             zip.putBitmap("res/drawable-xxhdpi/icon_background.png",
                 IconRenderer.shapeBitmap(ICON_SIZE, shape, bg), Bitmap.CompressFormat.PNG)
             zip.putBitmap("res/drawable-xxhdpi/icon_mask.png",

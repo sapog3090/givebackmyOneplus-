@@ -49,8 +49,8 @@ class MainActivity : AppCompatActivity() {
 
     private val prefs by lazy { getSharedPreferences("settings", MODE_PRIVATE) }
     private var accent = ACCENTS.first()
-    private var shape = IconShape.CIRCLE
-    private var style = IconStyle.ACCENT_BG
+    private var shape = IconShape.NATIVE
+    private var style = IconStyle.TINT
 
     private lateinit var preview: IconPreviewView
     private lateinit var nav: BottomNavigationView
@@ -65,8 +65,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         accent = prefs.getInt("accent", accent)
-        shape = IconShape.entries.getOrElse(prefs.getInt("shape", 0)) { IconShape.CIRCLE }
-        style = IconStyle.entries.getOrElse(prefs.getInt("style", 0)) { IconStyle.ACCENT_BG }
+        shape = IconShape.entries.getOrElse(prefs.getInt("shape2", 0)) { IconShape.NATIVE }
+        style = IconStyle.entries.getOrElse(prefs.getInt("style2", 0)) { IconStyle.TINT }
 
         setupNav()
         setupTheme()
@@ -143,12 +143,12 @@ class MainActivity : AppCompatActivity() {
 
         fillChips(findViewById(R.id.shapeGroup), IconShape.entries.map { it.title }, shape.ordinal) {
             shape = IconShape.entries[it]
-            prefs.edit().putInt("shape", it).apply()
+            prefs.edit().putInt("shape2", it).apply()
             preview.update(shape, style, accent)
         }
         fillChips(findViewById(R.id.styleGroup), IconStyle.entries.map { it.title }, style.ordinal) {
             style = IconStyle.entries[it]
-            prefs.edit().putInt("style", it).apply()
+            prefs.edit().putInt("style2", it).apply()
             preview.update(shape, style, accent)
         }
 
