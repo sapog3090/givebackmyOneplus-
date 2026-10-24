@@ -17,6 +17,7 @@ class FeaturesSection(private val activity: Activity) {
     private val btnOverlay: MaterialButton = activity.findViewById(R.id.btnPermOverlay)
     private val btnDnd: MaterialButton = activity.findViewById(R.id.btnPermDnd)
     private val slider: MaterialButtonToggleGroup = activity.findViewById(R.id.sliderGroup)
+    private val status: android.widget.TextView = activity.findViewById(R.id.serviceStatus)
     private var syncing = false
 
     private val sliderIds = mapOf(
@@ -47,6 +48,23 @@ class FeaturesSection(private val activity: Activity) {
             }
         }
 
+        activity.findViewById<MaterialButton>(R.id.btnStartService).setOnClickListener {
+            // На Android 13+ без этого разрешения уведомление службы не видно.
+            if (android.os.Build.VERSION.SDK_INT >= 33 &&
+                activity.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) !=
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                activity.requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 77)
+            }
+            try {
+                FeatureService.start(activity)
+                toast("Служба запускается…")
+            } catch (e: Exception) {
+                toast("Не запустилась: ${e.message}")
+            }
+            status.postDelayed({ updateStatus() }, 1500)
+        }
+
         bindSwitch(R.id.swLive, Features.LIVE)
         bindSwitch(R.id.swHorizon, Features.HORIZON)
         bindSwitch(R.id.swCharging, Features.CHARGING)
@@ -67,6 +85,14 @@ class FeaturesSection(private val activity: Activity) {
         syncSlider()
         // На случай, если службу убили — поднять снова, когда открыт экран.
         FeatureService.sync(activity)
+        updateStatus()
+    }
+
+    private fun updateStatus() {
+        status.text = "Служба: " + (if (FeatureService.running) "✅ работает" else "❌ не работает") +
+            "\nСлушатель уведомлений: " + (if (LiveService.connected) "✅ подключён" else "❌ не подключён") +
+            "\nПоследнее: ${LiveService.lastEvent}" +
+            "\nЗарядка: ${FeatureService.lastPower}"
     }
 
     private fun syncSlider() {

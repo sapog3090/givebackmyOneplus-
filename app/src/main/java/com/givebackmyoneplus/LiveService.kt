@@ -22,6 +22,12 @@ import androidx.core.content.ContextCompat
  */
 class LiveService : NotificationListenerService() {
 
+    companion object {
+        /** Для строки состояния в разделе «Функции». */
+        @Volatile var connected = false
+        @Volatile var lastEvent = "—"
+    }
+
     private val items = LinkedHashMap<String, LiveItem>()
     private val lastAlert = HashMap<String, Long>()
     private var lastHorizon = 0L
@@ -40,6 +46,8 @@ class LiveService : NotificationListenerService() {
     private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ -> refresh() }
 
     override fun onListenerConnected() {
+        connected = true
+        lastEvent = "слушатель подключён в ${now()}"
         pill = LivePill(this)
         ContextCompat.registerReceiver(
             this, power, IntentFilter(Intent.ACTION_POWER_CONNECTED), ContextCompat.RECEIVER_EXPORTED
@@ -53,6 +61,8 @@ class LiveService : NotificationListenerService() {
     }
 
     override fun onListenerDisconnected() {
+        connected = false
+        lastEvent = "слушатель отключён в ${now()}"
         try { unregisterReceiver(power) } catch (_: Exception) {}
         Features.prefs(this).unregisterOnSharedPreferenceChangeListener(prefsListener)
         pill?.hide()
@@ -61,6 +71,7 @@ class LiveService : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         if (sbn.packageName == packageName) return
+        lastEvent = "уведомление от ${sbn.packageName} в ${now()}"
         if (Features.enabled(this, Features.HORIZON) && shouldLight(sbn)) Overlays.horizon(this)
         consider(sbn)
         refresh()
@@ -151,4 +162,6 @@ class LiveService : NotificationListenerService() {
             p.show(top, Features.accent(this))
         }
     }
+
+    private fun now() = java.time.LocalTime.now().withNano(0).toString()
 }

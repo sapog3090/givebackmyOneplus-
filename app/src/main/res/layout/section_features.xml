@@ -41,6 +41,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Автозапуск и работа в фоне →" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStartService"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Запустить службу" />
+
+            <TextView
+                android:id="@+id/serviceStatus"
+                style="@style/Gbmo.Hint"
+                android:fontFamily="monospace" />
         </LinearLayout>
 
         <LinearLayout style="@style/Gbmo.Card">

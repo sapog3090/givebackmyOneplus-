@@ -29,6 +29,15 @@ class FeatureService : Service() {
         private const val CHANNEL = "gbmo_features"
         private const val NOTIF_ID = 1
 
+        @Volatile var running = false
+        @Volatile var lastPower = "—"
+
+        /** Запуск по кнопке — независимо от переключателей. */
+        fun start(context: Context) {
+            ContextCompat.startForegroundService(context, Intent(context, FeatureService::class.java))
+            requestListenerRebind(context)
+        }
+
         /** Запустить, если включена хоть одна функция; иначе остановить. */
         fun sync(context: Context) {
             val any = Features.enabled(context, Features.LIVE) ||
@@ -56,6 +65,7 @@ class FeatureService : Service() {
 
     private val power = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
+            lastPower = "зарядка подключена в ${java.time.LocalTime.now().withNano(0)}"
             if (!Features.enabled(context, Features.CHARGING)) return
             val battery = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
             val level = battery?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
@@ -66,6 +76,7 @@ class FeatureService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        running = true
         startForeground()
         ContextCompat.registerReceiver(
             this, power, IntentFilter(Intent.ACTION_POWER_CONNECTED), ContextCompat.RECEIVER_EXPORTED
@@ -79,6 +90,7 @@ class FeatureService : Service() {
     }
 
     override fun onDestroy() {
+        running = false
         try { unregisterReceiver(power) } catch (_: Exception) {}
         super.onDestroy()
     }
