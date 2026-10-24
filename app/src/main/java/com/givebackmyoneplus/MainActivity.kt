@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         setupClean()
         setupAbout()
         applyAccent()
+        if (savedInstanceState == null) Updater.check(this, silent = true)
     }
 
     override fun onResume() {
@@ -427,6 +428,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB)))
         }
         findViewById<MaterialButton>(R.id.btnWatermelon).setOnClickListener { showWatermelon() }
+        findViewById<MaterialButton>(R.id.btnUpdate).setOnClickListener { Updater.check(this, silent = false) }
     }
 
     private fun showWatermelon() {

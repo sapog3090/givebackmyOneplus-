@@ -11,15 +11,26 @@ android {
         applicationId = "com.givebackmyoneplus"
         minSdk = 29
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2"
+        // Номер сборки GitHub Actions — чтобы каждая новая сборка была «новее» предыдущей.
+        val ciBuild = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
+        versionCode = ciBuild
+        versionName = "0.3.$ciBuild"
+    }
+
+    signingConfigs {
+        // Постоянный ключ в репозитории: обновления ставятся поверх без удаления.
+        create("release") {
+            storeFile = file("release.jks")
+            storePassword = "android1"
+            keyAlias = "app"
+            keyPassword = "android1"
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            // Подписываем debug-ключом, чтобы APK можно было сразу поставить.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
