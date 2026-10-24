@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sectionTheme"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="24dp">
+
+        <TextView style="@style/Gbmo.Title" android:text="Тема" />
+        <TextView style="@style/Gbmo.Hint" android:text="Соберите тему HyperOS в стиле OxygenOS 16" />
+
+        <LinearLayout style="@style/Gbmo.Card">
+            <TextView style="@style/Gbmo.CardTitle" android:text="Акцентный цвет" />
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:id="@+id/swatches"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
+        </LinearLayout>
+
+        <LinearLayout style="@style/Gbmo.Card">
+            <TextView style="@style/Gbmo.CardTitle" android:text="Форма иконок" />
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/shapeGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:selectionRequired="true"
+                app:singleSelection="true"
+                xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+            <TextView
+                style="@style/Gbmo.CardTitle"
+                android:layout_marginTop="12dp"
+                android:text="Стиль иконок" />
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/styleGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:selectionRequired="true"
+                app:singleSelection="true"
+                xmlns:app="http://schemas.android.com/apk/res-auto" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Gbmo.Card">
+            <TextView style="@style/Gbmo.CardTitle" android:text="Предпросмотр" />
+            <com.givebackmyoneplus.IconPreviewView
+                android:id="@+id/preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBuild"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="16dp"
+            android:text="Собрать тему"
+            android:textSize="16sp"
+            app:cornerRadius="30dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenThemes"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:text="Открыть приложение «Темы»"
+            app:cornerRadius="28dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+        <TextView
+            android:id="@+id/themeStatus"
+            style="@style/Gbmo.Hint"
+            android:layout_marginTop="12dp"
+            android:text="⚗ Экспериментально: тема сохраняется в Загрузки/givebackmyOneplus. Способ применения на HyperOS без root ещё проверяем." />
+    </LinearLayout>
+</ScrollView>
