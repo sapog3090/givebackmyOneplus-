@@ -65,6 +65,8 @@ class FeaturesSection(private val activity: Activity) {
         btnOverlay.text = mark(Overlays.canDraw(activity), "Поверх других окон")
         btnDnd.text = mark(AlertSlider.hasDndAccess(activity), "Режим «Не беспокоить»")
         syncSlider()
+        // На случай, если службу убили — поднять снова, когда открыт экран.
+        FeatureService.sync(activity)
     }
 
     private fun syncSlider() {
@@ -79,6 +81,8 @@ class FeaturesSection(private val activity: Activity) {
         sw.setOnCheckedChangeListener { _, on ->
             Features.prefs(activity).edit().putBoolean(key, on).apply()
             if (on) requireOverlay()
+            // Поднять/остановить постоянную службу под текущий набор функций.
+            FeatureService.sync(activity)
         }
     }
 
