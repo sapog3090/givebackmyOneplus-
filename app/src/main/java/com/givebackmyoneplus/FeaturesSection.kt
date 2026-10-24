@@ -1,17 +1,21 @@
 package com.givebackmyoneplus
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.materialswitch.MaterialSwitch
 
 /** Раздел «Функции»: разрешения, Alert Slider, Live Alerts, Horizon Light, зарядка. */
-class FeaturesSection(private val activity: Activity) {
+class FeaturesSection(private val activity: AppCompatActivity) {
 
     private val btnNotif: MaterialButton = activity.findViewById(R.id.btnPermNotif)
     private val btnOverlay: MaterialButton = activity.findViewById(R.id.btnPermOverlay)
@@ -79,6 +83,18 @@ class FeaturesSection(private val activity: Activity) {
         activity.findViewById<MaterialButton>(R.id.btnTestCharging).setOnClickListener {
             if (requireOverlay()) Overlays.charging(activity, 76)
         }
+
+        // Zen Mode
+        mapOf(R.id.zen20 to 20, R.id.zen30 to 30, R.id.zen60 to 60).forEach { (id, min) ->
+            activity.findViewById<MaterialButton>(id).setOnClickListener {
+                activity.startActivity(
+                    Intent(activity, ZenActivity::class.java).putExtra("minutes", min)
+                )
+            }
+        }
+
+        // Режим чтения (ч/б) через Shizuku
+        activity.findViewById<MaterialButton>(R.id.btnReading).setOnClickListener { toggleReading() }
     }
 
     fun refresh() {
@@ -90,9 +106,28 @@ class FeaturesSection(private val activity: Activity) {
         // На случай, если службу убили — поднять снова, когда открыт экран.
         FeatureService.sync(activity)
         updateStatus()
+        updateReadingButton()
     }
 
     private var testPill: LivePill? = null
+
+    private fun toggleReading() {
+        if (!Shell.granted()) {
+            toast("Нужен Shizuku (вкладка «Очистка»)")
+            return
+        }
+        val turnOn = !ReadingMode.isOn(activity)
+        activity.lifecycleScope.launch {
+            val ok = withContext(Dispatchers.IO) { ReadingMode.set(turnOn) }
+            if (!ok) toast("Не удалось переключить")
+            updateReadingButton()
+        }
+    }
+
+    private fun updateReadingButton() {
+        activity.findViewById<MaterialButton>(R.id.btnReading).text =
+            if (ReadingMode.isOn(activity)) "Выключить ч/б" else "Включить ч/б"
+    }
 
     private fun setupPillOffset() {
         val label = activity.findViewById<android.widget.TextView>(R.id.pillOffsetLabel)

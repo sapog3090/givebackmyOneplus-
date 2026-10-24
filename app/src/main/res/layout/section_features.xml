@@ -150,5 +150,52 @@
                 android:layout_height="wrap_content"
                 android:text="Показать" />
         </LinearLayout>
+
+        <LinearLayout style="@style/Gbmo.Card">
+            <TextView style="@style/Gbmo.CardTitle" android:text="Zen Mode" />
+            <TextView style="@style/Gbmo.Hint" android:text="Режим фокуса: телефон запирается на время, только звонки. Выход — долгое нажатие." />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/zen20"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="20 мин" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/zen30"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="4dp"
+                    android:text="30 мин" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/zen60"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="60 мин" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout style="@style/Gbmo.Card">
+            <TextView style="@style/Gbmo.CardTitle" android:text="Режим чтения" />
+            <TextView style="@style/Gbmo.Hint" android:text="Чёрно-белый экран, как у OnePlus. Через Shizuku. Добавьте плитку «Режим чтения» в шторку для быстрого доступа." />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReading"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Включить ч/б" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
