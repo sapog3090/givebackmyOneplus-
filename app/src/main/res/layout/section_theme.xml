@@ -91,6 +91,13 @@
             android:layout_marginTop="4dp"
             android:text="Диагностика «Тем» (Shizuku)" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnThemeImport"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Эксперимент: подложить тему в «Темы»" />
+
         <TextView
             android:id="@+id/themeStatus"
             style="@style/Gbmo.Hint"

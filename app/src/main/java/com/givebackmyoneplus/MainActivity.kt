@@ -178,9 +178,39 @@ class MainActivity : AppCompatActivity() {
             }
         }
         findViewById<MaterialButton>(R.id.btnThemeDiag).setOnClickListener { themeDiagnostics() }
+        findViewById<MaterialButton>(R.id.btnThemeImport).setOnClickListener { themeImportExperiment() }
         findViewById<MaterialButton>(R.id.btnOpenThemes).setOnClickListener {
             val intent = packageManager.getLaunchIntentForPackage("com.android.thememanager")
             if (intent != null) startActivity(intent) else toast("Приложение «Темы» не найдено")
+        }
+    }
+
+    /** Эксперимент: кладём последнюю собранную тему в .data/import «Тем» и открываем «Темы». */
+    private fun themeImportExperiment() {
+        if (!Shell.granted()) {
+            toast("Нужен доступ Shizuku (вкладка «Очистка»)")
+            return
+        }
+        val importDir = "/sdcard/Android/data/com.android.thememanager/files/MIUI/theme/.data/import"
+        val cmd = "f=\$(ls -t /sdcard/Download/givebackmyOneplus/*.mtz 2>/dev/null | head -1); " +
+            "[ -z \"\$f\" ] && echo 'Сначала соберите тему' && exit 1; " +
+            "cp \"\$f\" $importDir/ && echo \"Скопировано: \$f\"; ls -la $importDir"
+        lifecycleScope.launch {
+            val (code, out) = withContext(Dispatchers.IO) {
+                runCatching { Shell.run(cmd) }.getOrElse { -1 to "Ошибка: ${it.message}" }
+            }
+            MaterialAlertDialogBuilder(this@MainActivity)
+                .setTitle(if (code == 0) "Тема подложена" else "Не получилось")
+                .setMessage(out + if (code == 0) "\n\nОткройте «Темы» → Профиль → Мои темы и посмотрите, появилась ли она." else "")
+                .setPositiveButton("Открыть «Темы»") { _, _ ->
+                    packageManager.getLaunchIntentForPackage("com.android.thememanager")?.let { startActivity(it) }
+                }
+                .setNeutralButton("Копировать") { _, _ ->
+                    val cm = getSystemService(android.content.ClipboardManager::class.java)
+                    cm.setPrimaryClip(android.content.ClipData.newPlainText("import", out))
+                }
+                .setNegativeButton("Закрыть", null)
+                .show()
         }
     }
 
@@ -191,19 +221,20 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val tm = "com.android.thememanager"
+        val data = "/sdcard/Android/data/$tm/files/MIUI/theme/.data"
         val cmd = listOf(
-            "echo '== version'",
-            "dumpsys package $tm | grep -E 'versionName|versionCode' | head -4",
-            "echo '== activities'",
-            "dumpsys package $tm | grep -oE '$tm/[A-Za-z0-9_.\$]+' | sort -u | head -200",
-            "echo '== data dir'",
-            "ls -la /sdcard/Android/data/$tm/files 2>&1 | head -40",
-            "echo '== MIUI dirs'",
-            "find /sdcard/Android/data/$tm/files -maxdepth 4 -type d 2>&1 | head -80",
-            "echo '== /sdcard/MIUI/theme'",
-            "ls -la /sdcard/MIUI/theme 2>&1 | head -20",
-            "echo '== mtz files'",
-            "find /sdcard/Android/data/$tm /sdcard/MIUI -name '*.mtz' 2>/dev/null | head -20",
+            "echo '== .data tree'",
+            "ls -laR $data 2>&1 | head -120",
+            "echo '== meta sample'",
+            "f=\$(find $data/meta -type f 2>/dev/null | head -1); echo \$f; head -c 2500 \"\$f\" 2>&1",
+            "echo; echo '== rights sample'",
+            "f=\$(find $data/rights -type f 2>/dev/null | head -1); echo \$f; head -c 800 \"\$f\" 2>&1 | strings | head -20",
+            "echo; echo '== intent filters'",
+            "dumpsys package $tm | grep -iE 'mtz|scheme|mimeType|Action: \"' | sort -u | head -60",
+            "echo '== debug/trial/import components'",
+            "dumpsys package $tm | grep -iE -A4 'DebugModeActivity|ThemeTrialReceiver|ComponentActivity|import' | head -60",
+            "echo '== write test'",
+            "touch $data/import/.gbmo_test && echo WRITE_OK && rm $data/import/.gbmo_test",
         ).joinToString("; ")
         toast("Собираю данные…")
         lifecycleScope.launch {
