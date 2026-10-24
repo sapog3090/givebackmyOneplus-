@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">givebackmyOneplus</string>
+    <string name="widget_desc">Часы OnePlus-стиля с датой и зарядом</string>
 </resources>
