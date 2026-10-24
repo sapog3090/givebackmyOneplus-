@@ -99,6 +99,13 @@
             android:text="Эксперимент: подложить тему в «Темы»" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnThemeView"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Эксперимент 2: открыть тему в «Темах»" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnThemeDebug"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="match_parent"

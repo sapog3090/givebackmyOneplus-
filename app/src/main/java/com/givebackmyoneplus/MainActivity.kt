@@ -180,6 +180,7 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<MaterialButton>(R.id.btnThemeDiag).setOnClickListener { themeDiagnostics() }
         findViewById<MaterialButton>(R.id.btnThemeImport).setOnClickListener { themeImportExperiment() }
+        findViewById<MaterialButton>(R.id.btnThemeView).setOnClickListener { themeViewExperiment() }
         findViewById<MaterialButton>(R.id.btnThemeDebug).setOnClickListener {
             // Скрытый режим отладки «Тем» (открытый intent-filter, Shizuku не нужен).
             try {
@@ -207,6 +208,66 @@ class MainActivity : AppCompatActivity() {
         findViewById<MaterialButton>(R.id.btnOpenThemes).setOnClickListener {
             val intent = packageManager.getLaunchIntentForPackage("com.android.thememanager")
             if (intent != null) startActivity(intent) else toast("Приложение «Темы» не найдено")
+        }
+    }
+
+    /**
+     * Эксперимент 2: «Темы» принимают VIEW с ViewLocalResource://view.local.resource/<путь>
+     * (ThemeDetailActivity — страница темы с кнопкой «Применить»). Пробуем варианты пути.
+     */
+    private fun themeViewExperiment() {
+        if (!Shell.granted()) {
+            toast("Нужен доступ Shizuku (вкладка «Очистка»)")
+            return
+        }
+        val dir = "/sdcard/Android/data/com.android.thememanager/files/MIUI/theme/.data/import/theme"
+        val inTheme = "$dir/gbmo.mtz"
+        val inDownload = "/sdcard/Download/givebackmyOneplus/gbmo.mtz"
+        val variants = listOf(
+            "Путь в папке «Тем»" to "ViewLocalResource://view.local.resource$inTheme",
+            "Путь в Загрузках" to "ViewLocalResource://view.local.resource$inDownload",
+            "Через file://" to "ViewLocalResource://view.local.resource/file://$inTheme",
+            "Только имя файла" to "ViewLocalResource://view.local.resource/gbmo.mtz",
+            "Параметр path" to "ViewLocalResource://view.local.resource/?path=$inTheme",
+        )
+        // Готовим копии под простым именем без пробелов.
+        val prepare = "f=\$(ls -t /sdcard/Download/givebackmyOneplus/OxygenStyle_*.mtz 2>/dev/null | head -1); " +
+            "[ -z \"\$f\" ] && echo 'Сначала соберите тему' && exit 1; " +
+            "cp \"\$f\" $inTheme && cp \"\$f\" $inDownload && echo OK"
+        lifecycleScope.launch {
+            val (code, out) = withContext(Dispatchers.IO) {
+                runCatching { Shell.run(prepare) }.getOrElse { -1 to (it.message ?: "") }
+            }
+            if (code != 0) {
+                toast(out)
+                return@launch
+            }
+            MaterialAlertDialogBuilder(this@MainActivity)
+                .setTitle("Как открыть тему?")
+                .setItems(variants.map { it.first }.toTypedArray()) { _, i -> openLocalResource(variants[i].second) }
+                .setNegativeButton("Закрыть", null)
+                .show()
+        }
+    }
+
+    private fun openLocalResource(uri: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri)).setPackage("com.android.thememanager")
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            // Если приложениям закрыто — пробуем с правами ADB.
+            lifecycleScope.launch {
+                val out = withContext(Dispatchers.IO) {
+                    runCatching {
+                        Shell.run("am start -a android.intent.action.VIEW -d '$uri' -p com.android.thememanager 2>&1").second
+                    }.getOrElse { it.message.orEmpty() }
+                }
+                MaterialAlertDialogBuilder(this@MainActivity)
+                    .setTitle("Ответ системы")
+                    .setMessage("${e.message}\n\nShizuku:\n$out")
+                    .setPositiveButton("OK", null)
+                    .show()
+            }
         }
     }
 
