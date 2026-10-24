@@ -9,6 +9,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.BatteryManager
 import android.os.Build
@@ -35,6 +36,26 @@ class FeatureService : Service() {
         /** Запуск по кнопке — независимо от переключателей. */
         fun start(context: Context) {
             ContextCompat.startForegroundService(context, Intent(context, FeatureService::class.java))
+            forceListenerReconnect(context)
+        }
+
+        /**
+         * После обновления приложения система часто «помнит» доступ к уведомлениям,
+         * но не подключает слушатель. Выключение и включение компонента заставляет
+         * её подключить заново.
+         */
+        fun forceListenerReconnect(context: Context) {
+            val cn = ComponentName(context, LiveService::class.java)
+            val pm = context.packageManager
+            try {
+                pm.setComponentEnabledSetting(
+                    cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP
+                )
+                pm.setComponentEnabledSetting(
+                    cn, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP
+                )
+            } catch (_: Exception) {
+            }
             requestListenerRebind(context)
         }
 

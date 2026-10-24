@@ -62,7 +62,9 @@ class FeaturesSection(private val activity: Activity) {
             } catch (e: Exception) {
                 toast("Не запустилась: ${e.message}")
             }
-            status.postDelayed({ updateStatus() }, 1500)
+            // Переподключение слушателя занимает несколько секунд.
+            status.postDelayed({ updateStatus() }, 2000)
+            status.postDelayed({ updateStatus() }, 6000)
         }
 
         bindSwitch(R.id.swLive, Features.LIVE)
