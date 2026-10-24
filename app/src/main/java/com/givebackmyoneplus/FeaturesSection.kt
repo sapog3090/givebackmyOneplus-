@@ -84,6 +84,19 @@ class FeaturesSection(private val activity: AppCompatActivity) {
             if (requireOverlay()) Overlays.charging(activity, 76)
         }
 
+        // Стиль анимации зарядки
+        val chargeGroup = activity.findViewById<MaterialButtonToggleGroup>(R.id.chargeStyleGroup)
+        val chargeIds = listOf(R.id.chargeRing, R.id.chargeBolt, R.id.chargeWave)
+        chargeGroup.check(chargeIds[Features.chargeStyle(activity).coerceIn(0, 2)])
+        chargeGroup.addOnButtonCheckedListener { _, id, checked ->
+            if (!checked) return@addOnButtonCheckedListener
+            val idx = chargeIds.indexOf(id)
+            if (idx >= 0) {
+                Features.prefs(activity).edit().putInt(Features.CHARGE_STYLE, idx).apply()
+                if (Overlays.canDraw(activity)) Overlays.charging(activity, 76)
+            }
+        }
+
         // Zen Mode
         mapOf(R.id.zen20 to 20, R.id.zen30 to 30, R.id.zen60 to 60).forEach { (id, min) ->
             activity.findViewById<MaterialButton>(id).setOnClickListener {

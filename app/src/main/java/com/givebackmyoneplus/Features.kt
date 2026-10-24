@@ -9,6 +9,7 @@ object Features {
     const val HORIZON = "horizon"
     const val CHARGING = "charging"
     const val PILL_Y = "pill_y"
+    const val CHARGE_STYLE = "charge_style"
     private const val DEFAULT_ACCENT = 0xFFEB0029.toInt()
 
     fun prefs(ctx: Context): SharedPreferences =
@@ -18,6 +19,9 @@ object Features {
 
     /** Отступ пилюли Live Alerts в dp; -1 — автоматически под строкой состояния. */
     fun pillOffsetDp(ctx: Context) = prefs(ctx).getInt(PILL_Y, -1)
+
+    /** Стиль анимации зарядки: 0 кольцо, 1 молния, 2 волна. */
+    fun chargeStyle(ctx: Context) = prefs(ctx).getInt(CHARGE_STYLE, 0)
 
     fun accent(ctx: Context) = prefs(ctx).getInt("accent", DEFAULT_ACCENT)
 }

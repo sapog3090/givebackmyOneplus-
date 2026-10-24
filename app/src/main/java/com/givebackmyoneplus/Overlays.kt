@@ -7,6 +7,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PixelFormat
 import android.graphics.RectF
 import android.graphics.SweepGradient
@@ -141,8 +142,11 @@ class HorizonView(ctx: Context, private val accent: Int) : AnimatedOverlay(ctx, 
 }
 
 /** Анимация зарядки: кольцо заполняется до текущего процента. */
+enum class ChargeStyle(val title: String) { RING("Кольцо"), BOLT("Молния"), WAVE("Волна") }
+
 class ChargingView(ctx: Context, private val accent: Int, private val level: Int) : AnimatedOverlay(ctx, 3200) {
 
+    private val style = ChargeStyle.entries.getOrElse(Features.chargeStyle(ctx)) { ChargeStyle.RING }
     private val dim = Paint().apply { color = Color.BLACK }
     private val track = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -176,28 +180,114 @@ class ChargingView(ctx: Context, private val accent: Int, private val level: Int
 
         val cx = width / 2f
         val cy = height / 2f
+        val fill = ease.getInterpolation((progress / 0.45f).coerceAtMost(1f))
+        val shown = (level * fill).toInt()
+
+        when (style) {
+            ChargeStyle.RING -> drawRing(canvas, cx, cy, a, fill, shown)
+            ChargeStyle.BOLT -> drawBolt(canvas, cx, cy, a, fill, shown)
+            ChargeStyle.WAVE -> drawWave(canvas, cx, cy, a, fill, shown)
+        }
+    }
+
+    private fun drawRing(canvas: Canvas, cx: Float, cy: Float, a: Float, fill: Float, shown: Int) {
         val radius = minOf(width, height) * 0.28f
         val stroke = 12 * density
         oval.set(cx - radius, cy - radius, cx + radius, cy + radius)
-
         track.strokeWidth = stroke
         track.alpha = (0x33 * a).toInt()
         canvas.drawArc(oval, 0f, 360f, false, track)
-
-        val fill = ease.getInterpolation((progress / 0.45f).coerceAtMost(1f))
         arc.strokeWidth = stroke
         arc.color = accent
         arc.alpha = (255 * a).toInt()
         arc.setShadowLayer(14 * density, 0f, 0f, accent)
         canvas.drawArc(oval, -90f, 360f * level / 100f * fill, false, arc)
-
         percent.textSize = radius * 0.55f
         percent.alpha = (255 * a).toInt()
-        val shown = (level * fill).toInt()
         canvas.drawText("$shown%", cx, cy + percent.textSize * 0.35f, percent)
+        drawLabel(canvas, cx, cy + radius + 48 * density, a)
+    }
 
+    private fun boltPath(cx: Float, cy: Float, h: Float): Path {
+        val w = h * 0.5f
+        return Path().apply {
+            moveTo(cx + w * 0.1f, cy - h / 2)
+            lineTo(cx - w * 0.5f, cy + h * 0.1f)
+            lineTo(cx - w * 0.02f, cy + h * 0.1f)
+            lineTo(cx - w * 0.1f, cy + h / 2)
+            lineTo(cx + w * 0.5f, cy - h * 0.15f)
+            lineTo(cx + w * 0.02f, cy - h * 0.15f)
+            close()
+        }
+    }
+
+    private fun drawBolt(canvas: Canvas, cx: Float, cy: Float, a: Float, fill: Float, shown: Int) {
+        val h = minOf(width, height) * 0.5f
+        val path = boltPath(cx, cy - h * 0.05f, h)
+        // Контур молнии.
+        arc.style = Paint.Style.STROKE
+        arc.strokeWidth = 4 * density
+        arc.color = 0x55FFFFFF
+        arc.alpha = (0x55 * a).toInt()
+        arc.clearShadowLayer()
+        canvas.drawPath(path, arc)
+        // Заливка снизу вверх по проценту.
+        val save = canvas.save()
+        canvas.clipPath(path)
+        arc.style = Paint.Style.FILL
+        arc.color = accent
+        arc.alpha = (255 * a).toInt()
+        arc.setShadowLayer(24 * density, 0f, 0f, accent)
+        val top = cy - h * 0.55f + h * 1.1f * (1 - level / 100f * fill)
+        canvas.drawRect(cx - h, top, cx + h, cy + h, arc)
+        canvas.restoreToCount(save)
+        arc.clearShadowLayer()
+        percent.textSize = h * 0.28f
+        percent.alpha = (255 * a).toInt()
+        canvas.drawText("$shown%", cx, cy + h * 0.78f, percent)
+        drawLabel(canvas, cx, cy + h * 0.95f, a)
+    }
+
+    private fun drawWave(canvas: Canvas, cx: Float, cy: Float, a: Float, fill: Float, shown: Int) {
+        val radius = minOf(width, height) * 0.3f
+        val circle = Path().apply { addCircle(cx, cy, radius, Path.Direction.CW) }
+        arc.style = Paint.Style.STROKE
+        arc.strokeWidth = 3 * density
+        arc.color = accent
+        arc.alpha = (0xAA * a).toInt()
+        arc.clearShadowLayer()
+        canvas.drawPath(circle, arc)
+        val save = canvas.save()
+        canvas.clipPath(circle)
+        // Поднимающаяся «жидкость» с волной.
+        val waterTop = cy + radius - radius * 2 * (level / 100f * fill)
+        val wave = Path().apply {
+            moveTo(cx - radius, waterTop)
+            val amp = radius * 0.06f
+            var x = cx - radius
+            while (x <= cx + radius) {
+                val y = waterTop + amp * kotlin.math.sin((x / radius * 3 + progress * 12).toDouble()).toFloat()
+                lineTo(x, y)
+                x += radius * 0.1f
+            }
+            lineTo(cx + radius, cy + radius)
+            lineTo(cx - radius, cy + radius)
+            close()
+        }
+        arc.style = Paint.Style.FILL
+        arc.color = accent
+        arc.alpha = (220 * a).toInt()
+        canvas.drawPath(wave, arc)
+        canvas.restoreToCount(save)
+        percent.textSize = radius * 0.5f
+        percent.alpha = (255 * a).toInt()
+        canvas.drawText("$shown%", cx, cy + percent.textSize * 0.35f, percent)
+        drawLabel(canvas, cx, cy + radius + 48 * density, a)
+    }
+
+    private fun drawLabel(canvas: Canvas, cx: Float, y: Float, a: Float) {
         label.textSize = 16 * density
         label.alpha = (0xCC * a).toInt()
-        canvas.drawText("⚡ Зарядка", cx, cy + radius + 48 * density, label)
+        canvas.drawText("⚡ Зарядка", cx, y, label)
     }
 }
