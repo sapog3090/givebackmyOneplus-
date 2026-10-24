@@ -175,6 +175,17 @@
         </LinearLayout>
 
         <LinearLayout style="@style/Gbmo.Card">
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/swShelf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Shelf (Полка)"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+            <TextView style="@style/Gbmo.Hint" android:text="Тонкий язычок у правого края. Нажатие — панель с батареей, памятью и быстрыми действиями." />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Gbmo.Card">
             <TextView style="@style/Gbmo.CardTitle" android:text="Zen Mode" />
             <TextView style="@style/Gbmo.Hint" android:text="Режим фокуса: телефон запирается на время, только звонки. Выход — долгое нажатие." />
             <LinearLayout

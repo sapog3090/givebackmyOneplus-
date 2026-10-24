@@ -8,6 +8,7 @@ object Features {
     const val LIVE = "live"
     const val HORIZON = "horizon"
     const val CHARGING = "charging"
+    const val SHELF = "shelf"
     const val PILL_Y = "pill_y"
     const val CHARGE_STYLE = "charge_style"
     private const val DEFAULT_ACCENT = 0xFFEB0029.toInt()

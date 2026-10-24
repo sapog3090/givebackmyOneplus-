@@ -63,7 +63,9 @@ class FeatureService : Service() {
         fun sync(context: Context) {
             val any = Features.enabled(context, Features.LIVE) ||
                 Features.enabled(context, Features.HORIZON) ||
-                Features.enabled(context, Features.CHARGING)
+                Features.enabled(context, Features.CHARGING) ||
+                Features.enabled(context, Features.SHELF)
+            Shelf.sync(context)
             val intent = Intent(context, FeatureService::class.java)
             if (any) {
                 ContextCompat.startForegroundService(context, intent)

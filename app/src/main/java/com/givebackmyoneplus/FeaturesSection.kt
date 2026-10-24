@@ -76,6 +76,7 @@ class FeaturesSection(private val activity: AppCompatActivity) {
         bindSwitch(R.id.swLive, Features.LIVE)
         bindSwitch(R.id.swHorizon, Features.HORIZON)
         bindSwitch(R.id.swCharging, Features.CHARGING)
+        bindSwitch(R.id.swShelf, Features.SHELF)
 
         activity.findViewById<MaterialButton>(R.id.btnTestHorizon).setOnClickListener {
             if (requireOverlay()) Overlays.horizon(activity)
@@ -118,6 +119,7 @@ class FeaturesSection(private val activity: AppCompatActivity) {
         syncSlider()
         // На случай, если службу убили — поднять снова, когда открыт экран.
         FeatureService.sync(activity)
+        Shelf.sync(activity)
         updateStatus()
         updateReadingButton()
     }
